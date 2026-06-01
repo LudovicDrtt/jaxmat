@@ -285,7 +285,7 @@ def eig33_HA(A, rtol=1e-16) -> tuple[jax.Array, jax.Array]:
 
 @partial(jax.jit, static_argnums=1)
 def eig33(A, rtol=1e-16):
-    norm_A = jnp.linalg.norm(A)
+    norm_A = safe_norm(A)
 
     def J2s(A):
         d0 = A[0, 0] - A[1, 1]
