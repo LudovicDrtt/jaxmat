@@ -5,7 +5,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and versioning aims to follow [Semantic Versioning](https://semver.org/) (with
 the usual 0.x caveat that minor bumps may include breaking changes).
 
-## [Unreleased]
+## v0.0.4 - 2026-07-08
 
 ### Fixed
 - Issue #39 Trust-region solvers (`GaussNewtonTrustRegion`, `NewtonTrustRegion`,
