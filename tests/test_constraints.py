@@ -6,7 +6,7 @@ import jax.numpy as jnp
 import paramax
 import pytest
 
-from jaxmat.constraints import Bounded, Interval, Positive
+from jaxmat.constraints import Bounded, Interval, Positive, Scaled, Unconstrained
 
 jax.config.update("jax_enable_x64", True)
 
@@ -19,6 +19,94 @@ class PositiveHolder(eqx.Module):
 
 class IntervalHolder(eqx.Module):
     x: jax.Array = Interval(0.0, 0.5)
+
+
+class U(eqx.Module):
+    x: jax.Array = Unconstrained()
+
+
+def S(ref):
+    class _S(eqx.Module):
+        x: jax.Array = Scaled(ref)
+
+    return _S
+
+
+# --------------------------------------------------------------------------- #
+# Unconstrained
+# --------------------------------------------------------------------------- #
+class TestUnconstrained:
+    @pytest.mark.parametrize("v", [-5.0, -1e-3, 0.0, 2.5, 7.0e4])
+    def test_roundtrip_including_negatives(self, v):
+        assert float(paramax.unwrap(U(x=v)).x) == pytest.approx(v, abs=1e-9, rel=1e-9)
+
+    def test_latent_equals_value(self):
+        # identity map: the stored latent is the value itself
+        m = U(x=3.5)
+        assert float(m.x.args[0]) == pytest.approx(3.5)
+
+    def test_strong_float_dtype(self):
+        assert paramax.unwrap(U(x=1.0)).x.dtype == jnp.float64
+
+    def test_gradient_is_physical(self):
+        # identity reparam => d/dlatent (x^2) = 2 x
+        g = eqx.filter_grad(lambda m: paramax.unwrap(m).x ** 2)(U(x=3.0))
+        (leaf,) = jax.tree_util.tree_leaves(eqx.filter(g, eqx.is_inexact_array))
+        assert float(leaf) == pytest.approx(6.0)
+
+    def test_idempotent_on_wrapped(self):
+        m1 = U(x=2.0)
+        m2 = U(x=m1.x)  # feeding an already-wrapped value through
+        assert m2.x is m1.x
+
+    def test_survives_flatten_unflatten(self):
+        m = U(x=-4.0)
+        leaves, td = jax.tree_util.tree_flatten(m)
+        r = jax.tree_util.tree_unflatten(td, leaves)
+        assert float(paramax.unwrap(r).x) == pytest.approx(-4.0)
+
+
+# --------------------------------------------------------------------------- #
+# Scaled
+# --------------------------------------------------------------------------- #
+class TestScaled:
+    @pytest.mark.parametrize("v", [-4e5, -1.0, 0.0, 2.5e5, 1e8])
+    def test_roundtrip_including_negatives(self, v):
+        cls = S(1e5)
+        assert float(paramax.unwrap(cls(x=v)).x) == pytest.approx(v, rel=1e-9, abs=1e-9)
+
+    def test_latent_is_order_one(self):
+        # storing x/ref brings the optimised latent to O(1)
+        cls = S(1e5)
+        m = cls(x=2.5e5)
+        assert float(m.x.args[0]) == pytest.approx(2.5)
+
+    def test_default_ref_is_identity(self):
+        cls = S(1.0)
+        m = cls(x=7.0)
+        assert float(m.x.args[0]) == pytest.approx(7.0)
+        assert float(paramax.unwrap(m).x) == pytest.approx(7.0)
+
+    def test_gradient_scales_with_ref(self):
+        # d/dlatent (x^2) with x = ref*u  =>  2 x * ref
+        ref = 1e5
+        cls = S(ref)
+        g = eqx.filter_grad(lambda m: paramax.unwrap(m).x ** 2)(cls(x=3e5))
+        (leaf,) = jax.tree_util.tree_leaves(eqx.filter(g, eqx.is_inexact_array))
+        assert float(leaf) == pytest.approx(2 * 3e5 * ref)
+
+    def test_idempotent_on_wrapped(self):
+        cls = S(10.0)
+        m1 = cls(x=50.0)
+        m2 = cls(x=m1.x)
+        assert m2.x is m1.x
+
+    def test_survives_flatten_unflatten(self):
+        cls = S(1e3)
+        m = cls(x=-2e3)
+        leaves, td = jax.tree_util.tree_flatten(m)
+        r = jax.tree_util.tree_unflatten(td, leaves)
+        assert float(paramax.unwrap(r).x) == pytest.approx(-2e3)
 
 
 class TestPositive:

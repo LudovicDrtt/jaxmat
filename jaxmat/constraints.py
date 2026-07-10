@@ -29,6 +29,31 @@ def _is_wrapped(v):
     return isinstance(v, paramax.AbstractUnwrappable)
 
 
+def Unconstrained():
+    """Unconstrained field."""
+
+    def convert(v):
+        if _is_wrapped(v):
+            return v
+        return paramax.Parameterize(lambda x: x, jnp.asarray(v, float))
+
+    return eqx.field(converter=convert)
+
+
+def Scaled(ref: float = 1.0):
+    """
+    Rescaled field storing x/ref (an O(1) latent variable); recover x = ref * latent.
+    Unconstrained value.
+    """
+
+    def convert(v):
+        if isinstance(v, paramax.AbstractUnwrappable):
+            return v
+        return paramax.Parameterize(lambda u: ref * u, jnp.asarray(v, float) / ref)
+
+    return eqx.field(converter=convert)
+
+
 def Positive():
     """Field constrained to be strictly positive (x > 0), via exp/log."""
 

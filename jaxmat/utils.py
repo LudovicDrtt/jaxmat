@@ -8,8 +8,21 @@ def default_value(value, dtype=jnp.float64, **kwargs):
 
 
 def enforce_dtype(dtype=jnp.float64, **kwargs):
-    """Initialize and convert a field with default `value` of imposed `dtype`."""
-    return eqx.field(converter=lambda x: jnp.asarray(x, dtype=dtype), **kwargs)
+    """Coerce a field to a strongly-typed array of the given ``dtype``.
+
+    Two values pass through untouched: ``None`` (so a field can be optional) and
+    an ``eqx.Module`` (e.g. a temperature-dependent parameter *expression*, to be
+    materialized later via ``evaluate_parameters``). Everything else is cast, which
+    also normalizes weak/strong/float32 inputs to a single dtype (avoiding jit
+    retracing).
+    """
+
+    def convert(x):
+        if x is None or isinstance(x, eqx.Module):
+            return x
+        return jnp.asarray(x, dtype=dtype)
+
+    return eqx.field(converter=convert, **kwargs)
 
 
 def _rgetattr(obj, attr):
