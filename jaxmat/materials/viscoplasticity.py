@@ -125,7 +125,7 @@ class GenericInternalState(AbstractState):
     """Plastic strain tensor"""
     nX: int = eqx.field(static=True, default=1)
     """Number of kinematic hardening mechanisms."""
-    X: SymmetricTensor2 = eqx.field(default=False)
+    X: SymmetricTensor2 = eqx.field(default=None)
     """Backstress tensors"""
 
     def __post_init__(self):
