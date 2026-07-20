@@ -1,0 +1,60 @@
+name: Bug report
+description: Report incorrect results, a crash, or unexpected numerical behavior
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a report! A minimal reproducible
+        example makes this much easier to investigate.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What went wrong? What did you expect to happen instead?
+    validations:
+      required: true
+  - type: textarea
+    id: mre
+    attributes:
+      label: Minimal reproducible example
+      description: >
+        A short, self-contained script that triggers the problem. Please
+        include the model setup and the call that fails.
+      render: python
+    validations:
+      required: true
+  - type: textarea
+    id: traceback
+    attributes:
+      label: Traceback / output
+      description: The full error message and traceback, or the incorrect output.
+      render: text
+    validations:
+      required: false
+  - type: input
+    id: jaxmat-version
+    attributes:
+      label: jaxmat version
+      placeholder: "e.g. 0.0.4, or a commit hash if installed from source"
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: >
+        Output of `pip list | grep -Ei "jax|optimistix|lineax|equinox|diffrax|paramax"`,
+        your Python version, OS, and whether you are on CPU or GPU.
+      render: text
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues and this has not been reported yet.
+          required: true
+        - label: I am using a supported Python version (3.11 or 3.12).
+          required: false

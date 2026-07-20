@@ -1,0 +1,10 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation and demos
+    url: https://erc-automatix.github.io/jaxmat/
+    about: Check the getting-started guide, demos, and API reference first.
+  - name: Question / usage help
+    url: https://github.com/erc-automatix/jaxmat/discussions
+    about: >
+      For usage questions and modeling help, please open a Discussion. (If
+      Discussions are not enabled, open a blank issue with the "question" label.)

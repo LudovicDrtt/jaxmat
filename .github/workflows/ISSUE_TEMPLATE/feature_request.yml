@@ -1,0 +1,47 @@
+name: Feature request
+description: Suggest a new material model, component, solver, or capability
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion! For larger additions it helps to discuss the
+        design here before opening a pull request.
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: >
+        What problem would this solve, or what are you trying to model? A concrete
+        use case helps us design the right abstraction.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed feature
+      description: >
+        What would you like added? If this is a new modeling component (yield
+        surface, hardening law, flow rule, potential, neural component, solver…),
+        describe how it would fit into the existing framework.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: >
+        Relevant papers, equations, or existing implementations, if any.
+    validations:
+      required: false
+  - type: dropdown
+    id: contribute
+    attributes:
+      label: Would you be willing to contribute this?
+      options:
+        - "I'm just suggesting the idea"
+        - "I could help with testing or review"
+        - "I would like to implement it (with guidance)"
+        - "I plan to open a pull request"
+    validations:
+      required: false
