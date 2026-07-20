@@ -39,8 +39,10 @@ parts:
       - file: sharp_bits.md
   - caption: API
     chapters:
+      - file: api/jaxmat.constraints.rst
       - file: api/jaxmat.loader.rst
       - file: api/jaxmat.materials.rst
+      - file: api/jaxmat.parameters.rst
       - file: api/jaxmat.solvers.rst
       - file: api/jaxmat.state.rst
       - file: api/jaxmat.tensors.rst

@@ -1,14 +1,22 @@
-"""Constrained parameter mappings for calibration (backed by ``paramax``).
+r"""Constrained parameter mappings for calibration (backed by ``paramax``).
 
-A material parameter can be reparameterized so that gradient-based calibration
-stays in a feasible region by construction. Declare a field with ``Positive()`` or
-``Interval(lo, hi)``; construct the model with ordinary physical values, and call
-``paramax.unwrap(model)`` once at the top of the loss. Every read then sees the
-constrained value while the optimiser works on an unconstrained latent.
+A material parameter $\theta$ with physical constraints (e.g. positive) can be reparameterized
+so that gradient-based calibration stays in a feasible region by construction. This typically
+works by introducing a non-linear function $f$ whose codomain (output domain) is the wanted
+constrained region, e.g. $f: \mathbb{R} \mapsto \mathbb{R}^+$. A latent variable representation
+$z_\theta$ is used under-the-hood such that $\theta = f(z_{\theta})$ naturally satisfies the
+constraints.
+
+**Usage**: Declare a field with ``Positive()`` or ``Interval(lo, hi)``; construct the model with
+ordinary physical values, and call ``paramax.unwrap(model)`` once at the top of the loss. Every
+read then sees the constrained value while the optimiser works on an unconstrained latent
+representation $z_\theta$.
+
+.. code-block:: python
 
     class Mat(eqx.Module):
         E:  jax.Array = Positive()
-        nu: jax.Array = Interval(0.0, 0.5)
+        nu: jax.Array = Interval(-1.0, 0.5)
 
     m = Mat(E=210e3, nu=0.3)          # raw values; auto-wrapped
     def loss(m, target):
@@ -41,8 +49,10 @@ def Unconstrained():
 
 
 def Scaled(ref: float = 1.0):
-    """
-    Rescaled field storing x/ref (an O(1) latent variable); recover x = ref * latent.
+    r"""
+    Rescaled field storing $\theta/\text{ref}$ (an $O(1)$ latent variable); recover
+    $\theta = \text{ref} * z_{\theta}$.
+
     Unconstrained value.
     """
 
@@ -55,7 +65,7 @@ def Scaled(ref: float = 1.0):
 
 
 def Positive():
-    """Field constrained to be strictly positive (x > 0), via exp/log."""
+    r"""Field constrained to be strictly positive ($\theta > 0$), via $f(z)=\exp(z)$."""
 
     def convert(v):
         if _is_wrapped(v):
@@ -66,7 +76,8 @@ def Positive():
 
 
 def Interval(lo: float, hi: float):
-    """Field constrained to an open interval (lo < x < hi), via a scaled sigmoid."""
+    r"""Field constrained to an open interval ($\text{lo} < \theta < \text{hi}$),
+    via a scaled sigmoid."""
 
     def convert(v):
         if _is_wrapped(v):

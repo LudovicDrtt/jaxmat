@@ -22,11 +22,11 @@ class GeneralizedStandardMaterial(jm.SmallStrainBehavior):
     - A **dissipation pseudo-potential** $\Phi(\dot{\balpha})$ defining the
       evolution of the internal variables (irreversible processes).
 
-    The state variable evolution is obtained by minimizing the **incremental potential**:
+    The state variable evolution is obtained by minimizing the incremental potential:
 
     $$\min_{\Delta \balpha} J(\Delta\balpha ;\beps_{n+1},\balpha_n)
-       = \min_{\Delta \balpha} \Psi(\beps_{n+1}, \balpha_n + \Delta \balpha)
-       + \Delta t \Phi\left(\dfrac{\Delta \balpha}{\Delta t}\right)
+    = \min_{\Delta \balpha} \Psi(\beps_{n+1}, \balpha_n + \Delta \balpha)
+    + \Delta t \Phi\left(\dfrac{\Delta \balpha}{\Delta t}\right)
     $$
 
     subject to the current strain $\beps_{n+1} = \beps_n+\Delta\beps$ and time increment $\Delta t$.

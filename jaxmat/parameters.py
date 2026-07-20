@@ -49,7 +49,7 @@ class Constant(AbstractParameter):
 
 
 class Affine(AbstractParameter):
-    r"""Linear law $p(T) = p_\text{ref} + s\,(T - T_\text{ref})$."""
+    r"""Linear law $$p(T) = p_{ref} + s\,(T - T_{ref}).$$"""
 
     ref: jax.Array = enforce_dtype()
     slope: jax.Array = enforce_dtype()
@@ -60,7 +60,12 @@ class Affine(AbstractParameter):
 
 
 class Polynomial(AbstractParameter):
-    r"""$p(T) = \sum_k c_k (T - T_\text{ref})^k$ (``coeffs`` low->high order)."""
+    r"""
+    Polynomial law
+
+    $$p(T) = \sum_k c_k (T - T_{ref})^k$$
+
+    (``coeffs`` are ordered from low to high order)."""
 
     coeffs: jax.Array = enforce_dtype()
     T_ref: jax.Array = enforce_dtype(default=DEFAULT_TEMPERATURE)
@@ -70,18 +75,24 @@ class Polynomial(AbstractParameter):
 
 
 class Arrhenius(AbstractParameter):
-    r"""$p(T) = A\,\exp(-Q / (R\,T))$ (``T`` absolute)."""
+    r"""Arrhenius activation energy law
+
+    $$p(T) = A\,\exp(-Q / (R\,T))$$
+    """
 
     A: jax.Array = enforce_dtype()
+    """Arrhenius factor."""
     Q: jax.Array = enforce_dtype()
-    R: jax.Array = enforce_dtype(default=8.314462618)
+    """Activation energy"""
+    R: jax.Array = enforce_dtype(static=True, default=8.314462618)
+    r"""Universal gas constant $R=8.314462618 \text{J}.\text{K}^{-1}.\text{mol}^{-1}."""
 
     def evaluate(self, T):
         return self.A * jnp.exp(-self.Q / (self.R * T))
 
 
 class Expression(AbstractParameter):
-    """Wrap any callable / ``eqx.Module`` ``fn(T) -> scalar`` as a parameter."""
+    """Wrap any ``callable`` / ``eqx.Module`` with signature ``fn(T) -> scalar`` as a parameter."""
 
     fn: eqx.Module
 
@@ -102,9 +113,11 @@ def evaluate_parameters(model, T):
     """Materialize every ``AbstractParameter`` in ``model`` at temperature ``T``.
 
     For an isothermal analysis, resolve once and use the result as an ordinary
-    constant model::
+    constant model:
 
-        isothermal = evaluate_parameters(model, T_fixed)
+    .. code-block:: python
+
+       isothermal = evaluate_parameters(model, T_fixed)
     """
     if T is None:
         if has_parameter_dependence(model):
