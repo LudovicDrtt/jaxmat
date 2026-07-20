@@ -34,7 +34,7 @@ def _rgetattr(obj, attr):
 
 def partition_by_node_names(model, freeze_names):
     """
-    Partition an Equinox model into (trainable, static) where
+    Partition an ``euinox`` model into (trainable, static) where
     attributes listed in `freeze_names` are frozen (moved to static).
     """
 
@@ -58,14 +58,18 @@ def partition_by_node_names(model, freeze_names):
 
 def print_eqx_fields(obj, fields=None, indent=0):
     """
-    Recursively print fields of an Equinox module or dataclass-like object.
+    Recursively print fields of an ``equinox`` module or dataclass-like object.
 
-    Args:
-        obj: The Equinox module or object to inspect.
-        fields: Optional list of field names (strings) to print.
-                Supports nested paths like ["layer1", "layer2.weight"].
-                If None, prints all fields recursively.
-        indent: Internal indentation level (used for recursion).
+    Parameters
+    ----------
+    obj: eqx.Module
+        The module or object to inspect.
+    fields: list
+        Optional list of field names (strings) to print.
+        Supports nested paths like ``["layer1", "layer2.weight"]``.
+        If ``None``, prints all fields recursively.
+    indent: int
+        Internal indentation level (used for recursion).
     """
     pad = " " * indent
 

@@ -43,9 +43,12 @@ class AbstractPlasticSurface(eqx.Module):
     def normal(self, sig: SymmetricTensor2, *args):
         """Normal to the yield surface. Computed automatically using forward AD on :func:`__call__`.
 
-        Args:
-            sig: Stress tensor.
-            args: Additional thermodynamic forces entering the yield surface definition.
+        Parameters
+        ----------
+        sig:
+            Stress tensor.
+        args:
+            Additional thermodynamic forces entering the yield surface definition.
         """
         return jax.jacfwd(self.__call__, argnums=0)(sig, *args)
 

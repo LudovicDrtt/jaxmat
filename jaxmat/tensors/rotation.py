@@ -20,7 +20,8 @@ def from_axis_angle(axis, theta):
     ----------
     axis : array_like, shape (..., 3)
         Rotation axis vectors. They do not need to be normalized.
-        The last dimension must be 3.
+        The last dimension must be 3. First except last dimensions
+        are interpreted as batch dimensions.
     theta : array_like, shape (...)
         Rotation angle(s) in radians. Must be broadcast-compatible
         with ``axis[..., 0]``.
