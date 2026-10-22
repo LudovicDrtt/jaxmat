@@ -70,7 +70,7 @@ class FeFpJ2Plasticity(FiniteStrainBehavior):
         dp, be_bar = dy
         y = isv_old.update(p=isv_old.p + dp, be_bar=be_bar)
 
-        s = self.elasticity.mu * dev(be_bar)
+        s = dev(be_bar) * self.elasticity.mu
         J = det(F)
         tau = s + self.elasticity.kappa / 2 * (J**2 - 1) * Id
         P = Tensor2(tensor=tau @ (F.T).inv)
