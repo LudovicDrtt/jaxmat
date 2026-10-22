@@ -49,7 +49,7 @@ class FeFpJ2Plasticity(FiniteStrainBehavior):
 
             def residual(dy, args):
                 dp, be_bar = dy
-                s = self.elasticity.mu * dev(be_bar)
+                s = dev(be_bar) * self.elasticity.mu
                 yield_criterion = self.plastic_surface(s) - self.yield_stress(p_old + dp)
                 n = self.plastic_surface.normal(s)
                 res = (
