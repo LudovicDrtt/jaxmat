@@ -109,5 +109,11 @@ def FischerBurmeister(x, y):
     and is commonly used in complementarity problem formulations to provide
     a semi-smooth reformulation of the complementarity conditions
     $$x \geq 0, y \geq 0, xy = 0$$.
+
+    The square root is exact down to zero, with a zero gradient at the origin: a floored
+    root (as in :func:`safe_sqrt`) would make $\Phi$ linear near the origin and lose the
+    complementarity there.
     """
-    return x + y - safe_sqrt(x**2 + y**2)
+    r2 = x**2 + y**2
+    positive = r2 > 0
+    return x + y - jnp.where(positive, jnp.sqrt(jnp.where(positive, r2, 1.0)), 0.0)

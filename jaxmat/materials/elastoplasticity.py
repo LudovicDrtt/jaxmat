@@ -67,7 +67,11 @@ class vonMisesIsotropicHardening(SmallStrainBehavior):
                 res = FB(-yield_criterion / self.elasticity.E, dp)
                 return res
 
-            dy0 = jnp.array(0.0)
+            # Start from the linearized return mapping, off the kink of the Fischer-Burmeister
+            # function at dp = 0, so that a small dp converges below the solver tolerance.
+            f_el = sig_eq_el - self.yield_stress(p_old)
+            slope = 3 * mu + jax.grad(self.yield_stress)(p_old)
+            dy0 = jnp.where((f_el > 0) & (slope > 0), f_el / jnp.where(slope > 0, slope, 1.0), 0.0)
             sol = optx.root_find(residual, self.solver, dy0, adjoint=self.adjoint)
             dp = sol.value
 
